@@ -1,14 +1,94 @@
-dataset/
-.agents/
-.engineering/
-.venv/
+# ==========================================
+# Python & Bytecode
+# ==========================================
 __pycache__/
 *.py[cod]
-.idea/
-.vscode/
-*.db
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==========================================
+# Virtual Environments
+# ==========================================
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
 .env
+.env.*
+!.env.example
+
+# ==========================================
+# Databases & Logs
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# ==========================================
+# Face Datasets & Trained ML Models (Privacy & Size)
+# ==========================================
 data_img/
+dataset/
 coc.xml
 Images/
 *detector*.png
+
+# ==========================================
+# Tooling, Linters & Test Caches
+# ==========================================
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+test-results/
+playwright-report/
+
+# ==========================================
+# IDEs & Editor Configuration
+# ==========================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ==========================================
+# Operating System Artifacts
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================================
+# Agent & Audit Frameworks
+# ==========================================
+.agents/
+.engineering/
