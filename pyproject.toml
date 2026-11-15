@@ -1,0 +1,24 @@
+[project]
+name = "projects-smartattend"
+version = "0.1.0"
+description = "SmartAttend: Facial Recognition Attendance Management System using OpenCV, Flask, and SQLite/MySQL"
+readme = "README.md"
+authors = [
+    { name = "AAYUSH KARKI", email = "aayushkarki1215@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.0.0",
+    "mysql-connector-python>=8.0.33",
+    "numpy>=1.24.3",
+    "opencv-contrib-python>=4.8.0.76",
+    "pillow>=10.0.0",
+    "ruff>=0.17.5",
+]
+
+[project.scripts]
+projects-smartattend = "projects_smartattend:main"
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.13.0"]
+build-backend = "uv_build"

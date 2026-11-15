@@ -1,1 +1,14 @@
 dataset/
+.agents/
+.engineering/
+.venv/
+__pycache__/
+*.py[cod]
+.idea/
+.vscode/
+*.db
+.env
+data_img/
+coc.xml
+Images/
+*detector*.png

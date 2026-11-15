@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SmartAttend{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">System Control Center</h1>
+            <p class="text-sm text-slate-500 mt-1">Real-time facial recognition attendance overview and quick actions.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('detector') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-sm transition">
+                <i data-lucide="play" class="w-4 h-4"></i> Start Face Detector
+            </a>
+            <a href="{{ url_for('students') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm shadow-sm transition">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Add Student
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Metric 1: Students -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Registered Students</p>
+                <h3 class="text-2xl font-bold text-slate-900 mt-0.5">{{ total_students }}</h3>
+            </div>
+        </div>
+
+        <!-- Metric 2: Today Attendance -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="clipboard-check" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Attendance Today</p>
+                <h3 class="text-2xl font-bold text-slate-900 mt-0.5">{{ today_attendance }}</h3>
+            </div>
+        </div>
+
+        <!-- Metric 3: Sample Photos -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <i data-lucide="image" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Training Face Samples</p>
+                <h3 class="text-2xl font-bold text-slate-900 mt-0.5">{{ total_samples }}</h3>
+            </div>
+        </div>
+
+        <!-- Metric 4: Model Status -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl {% if model_exists %}bg-amber-50 text-amber-600{% else %}bg-rose-50 text-rose-600{% endif %} flex items-center justify-center">
+                <i data-lucide="cpu" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Classifier Model</p>
+                <h3 class="text-sm font-bold {% if model_exists %}text-emerald-600{% else %}text-rose-600{% endif %} mt-1">
+                    {% if model_exists %}Ready (LBPH Active){% else %}Model Untrained{% endif %}
+                </h3>
+                {% if model_time %}
+                <p class="text-[11px] text-slate-400">Trained: {{ model_time }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Cards (Series) -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 mb-4">Operations & Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Action 1 -->
+            <a href="{{ url_for('detector') }}" class="group block p-4 rounded-xl border border-slate-200 hover:border-emerald-500 hover:shadow-md transition bg-gradient-to-br from-white to-emerald-50/30">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3 group-hover:scale-105 transition">
+                    <i data-lucide="scan" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-semibold text-slate-900 group-hover:text-emerald-700 transition">1. Live Face Detector</h4>
+                <p class="text-xs text-slate-500 mt-1">Run real-time webcam face recognition and mark attendance automatically.</p>
+            </a>
+
+            <!-- Action 2 -->
+            <a href="{{ url_for('students') }}" class="group block p-4 rounded-xl border border-slate-200 hover:border-blue-500 hover:shadow-md transition bg-gradient-to-br from-white to-blue-50/30">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-3 group-hover:scale-105 transition">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-semibold text-slate-900 group-hover:text-blue-700 transition">2. Student Directory & Capture</h4>
+                <p class="text-xs text-slate-500 mt-1">Manage student profiles, rolls, departments, and capture 100 face samples.</p>
+            </a>
+
+            <!-- Action 3 -->
+            <a href="{{ url_for('train_page') }}" class="group block p-4 rounded-xl border border-slate-200 hover:border-amber-500 hover:shadow-md transition bg-gradient-to-br from-white to-amber-50/30">
+                <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-3 group-hover:scale-105 transition">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-semibold text-slate-900 group-hover:text-amber-700 transition">3. Train LBPH Classifier</h4>
+                <p class="text-xs text-slate-500 mt-1">Compile captured student images into the LBPH model binary (`coc.xml`).</p>
+            </a>
+
+            <!-- Action 4 -->
+            <a href="{{ url_for('attendance') }}" class="group block p-4 rounded-xl border border-slate-200 hover:border-sky-500 hover:shadow-md transition bg-gradient-to-br from-white to-sky-50/30">
+                <div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center mb-3 group-hover:scale-105 transition">
+                    <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-semibold text-slate-900 group-hover:text-sky-700 transition">4. Attendance Logs & Export</h4>
+                <p class="text-xs text-slate-500 mt-1">Filter daily attendance, verify timestamps, and export attendance.csv.</p>
+            </a>
+
+            <!-- Action 5 -->
+            <a href="{{ url_for('export_attendance') }}" class="group block p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:shadow-md transition bg-gradient-to-br from-white to-indigo-50/30">
+                <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center mb-3 group-hover:scale-105 transition">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-semibold text-slate-900 group-hover:text-indigo-700 transition">5. Quick Download CSV</h4>
+                <p class="text-xs text-slate-500 mt-1">One-click download of all accumulated attendance records directly to disk.</p>
+            </a>
+
+            <!-- Action 6 -->
+            <a href="{{ url_for('developers') }}" class="group block p-4 rounded-xl border border-slate-200 hover:border-purple-500 hover:shadow-md transition bg-gradient-to-br from-white to-purple-50/30">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center mb-3 group-hover:scale-105 transition">
+                    <i data-lucide="code" class="w-5 h-5"></i>
+                </div>
+                <h4 class="font-semibold text-slate-900 group-hover:text-purple-700 transition">6. Team & System Info</h4>
+                <p class="text-xs text-slate-500 mt-1">Project contributors, architecture details, and technology stack info.</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Attendance Table -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+            <div>
+                <h3 class="font-bold text-slate-900">Today's Attendance Stream</h3>
+                <p class="text-xs text-slate-500">Live attendance marked by the facial recognition system today.</p>
+            </div>
+            <a href="{{ url_for('attendance') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-500 flex items-center gap-1">
+                View all records <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
+                    <tr>
+                        <th class="px-5 py-3 font-semibold">Student ID</th>
+                        <th class="px-5 py-3 font-semibold">Roll No</th>
+                        <th class="px-5 py-3 font-semibold">Student Name</th>
+                        <th class="px-5 py-3 font-semibold">Time Marked</th>
+                        <th class="px-5 py-3 font-semibold">Date</th>
+                        <th class="px-5 py-3 font-semibold">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for rec in recent_records %}
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="px-5 py-3.5 font-medium text-slate-900">{{ rec.std_id }}</td>
+                        <td class="px-5 py-3.5 font-mono text-xs">{{ rec.std_roll_no }}</td>
+                        <td class="px-5 py-3.5 font-medium text-slate-800">{{ rec.std_name }}</td>
+                        <td class="px-5 py-3.5 text-xs text-slate-500">{{ rec.std_time }}</td>
+                        <td class="px-5 py-3.5 text-xs text-slate-500">{{ rec.std_date }}</td>
+                        <td class="px-5 py-3.5">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Present
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-5 py-8 text-center text-sm text-slate-400">
+                            No attendance records marked today yet. Run the <a href="{{ url_for('detector') }}" class="text-blue-600 hover:underline">Live Detector</a>.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Face Attendance System{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand / Logo -->
+                <div class="flex items-center gap-3">
+                    <a href="{{ url_for('dashboard') }}" class="flex items-center gap-2.5 group">
+                        <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:bg-blue-500 transition">
+                            <i data-lucide="scan-face" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-bold text-lg tracking-tight text-white group-hover:text-blue-300 transition">SmartAttend</span>
+                    </a>
+                    <span class="hidden sm:inline-block text-xs font-semibold px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
+                        Face AI
+                    </span>
+                </div>
+
+                <!-- Navigation Links -->
+                {% if session.get('user_email') %}
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="{{ url_for('dashboard') }}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition flex items-center gap-1.5 {% if request.endpoint == 'dashboard' %}bg-slate-800 text-blue-400{% else %}text-slate-300{% endif %}">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('detector') }}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition flex items-center gap-1.5 {% if request.endpoint == 'detector' %}bg-slate-800 text-emerald-400{% else %}text-slate-300{% endif %}">
+                        <i data-lucide="camera" class="w-4 h-4"></i> Live Detector
+                    </a>
+                    <a href="{{ url_for('students') }}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition flex items-center gap-1.5 {% if request.endpoint == 'students' %}bg-slate-800 text-blue-400{% else %}text-slate-300{% endif %}">
+                        <i data-lucide="users" class="w-4 h-4"></i> Students
+                    </a>
+                    <a href="{{ url_for('train_page') }}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition flex items-center gap-1.5 {% if request.endpoint == 'train_page' %}bg-slate-800 text-amber-400{% else %}text-slate-300{% endif %}">
+                        <i data-lucide="cpu" class="w-4 h-4"></i> Train Model
+                    </a>
+                    <a href="{{ url_for('attendance') }}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition flex items-center gap-1.5 {% if request.endpoint == 'attendance' %}bg-slate-800 text-sky-400{% else %}text-slate-300{% endif %}">
+                        <i data-lucide="clipboard-check" class="w-4 h-4"></i> Attendance
+                    </a>
+                    <a href="{{ url_for('developers') }}" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition flex items-center gap-1.5 {% if request.endpoint == 'developers' %}bg-slate-800 text-purple-400{% else %}text-slate-300{% endif %}">
+                        <i data-lucide="code-2" class="w-4 h-4"></i> Team
+                    </a>
+                </nav>
+
+                <!-- User profile & Logout -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex flex-col text-right">
+                        <span class="text-xs font-semibold text-slate-200">{{ session.get('user_name', 'Teacher') }}</span>
+                        <span class="text-[11px] text-slate-400">{{ session.get('user_email') }}</span>
+                    </div>
+                    <a href="{{ url_for('logout') }}" title="Sign out" class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                {% else %}
+                <div class="flex items-center gap-2">
+                    <a href="{{ url_for('login') }}" class="px-4 py-2 text-sm font-medium text-slate-200 hover:text-white transition">Sign In</a>
+                    <a href="{{ url_for('register') }}" class="px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-sm transition">Register</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Notification Alerts -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set alert_bg = "bg-blue-50 border-blue-200 text-blue-800" %}
+                    {% if category == "success" %}{% set alert_bg = "bg-emerald-50 border-emerald-200 text-emerald-800" %}
+                    {% elif category == "danger" %}{% set alert_bg = "bg-red-50 border-red-200 text-red-800" %}
+                    {% elif category == "warning" %}{% set alert_bg = "bg-amber-50 border-amber-200 text-amber-800" %}
+                    {% endif %}
+                    <div class="flex items-center justify-between p-3.5 mb-3 rounded-lg border text-sm font-medium shadow-sm {{ alert_bg }}" role="alert">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Page Content -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <span>Face Attendance Management System &bull; OpenCV LBPH + Python 3.12</span>
+            <span>Local Database: SQLite (Auto-sync) &bull; Camera Device 0</span>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

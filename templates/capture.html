@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Capture Face Photos - SmartAttend{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Breadcrumb / Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div>
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                <a href="{{ url_for('students') }}" class="hover:text-blue-600">Students</a>
+                <span>&bull;</span>
+                <span>Photo Dataset Enrollment</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Capturing Faces: {{ student.Name }}</h1>
+            <p class="text-sm text-slate-500 mt-0.5">Student ID: <code class="font-mono text-blue-600 font-bold">{{ student.Student_ID }}</code> &bull; Roll: {{ student.Roll_No }} &bull; Department: {{ student.Department }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('students') }}" class="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium transition flex items-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Students
+            </a>
+            <a href="{{ url_for('train_page') }}" class="px-4 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold transition flex items-center gap-2 shadow-sm">
+                <i data-lucide="cpu" class="w-4 h-4"></i> Proceed to Train
+            </a>
+        </div>
+    </div>
+
+    <!-- Capture View Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Video Stream Box -->
+        <div class="lg:col-span-2 bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-lg relative flex items-center justify-center min-h-[460px]">
+            <img src="{{ url_for('video_feed_capture', student_id=student.Student_ID) }}" 
+                 alt="Webcam Face Capture Stream" 
+                 class="w-full h-auto object-contain max-h-[600px] rounded-2xl">
+            
+            <!-- Live Indicator Badge -->
+            <div class="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-700 text-xs text-white">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                <span>Camera Stream Active</span>
+            </div>
+        </div>
+
+        <!-- Instructions & Guidelines Card -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+            <div>
+                <h3 class="font-bold text-slate-900 text-base">Capture Instructions</h3>
+                <p class="text-xs text-slate-500 mt-1">OpenCV is automatically detecting faces and capturing 100 crops into <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">data_img/</code>.</p>
+            </div>
+
+            <div class="space-y-3.5 text-xs text-slate-600">
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-blue-50/60 border border-blue-100 text-blue-900">
+                    <i data-lucide="smile" class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="block font-semibold">Face Camera Directly</strong>
+                        Ensure good lighting and avoid wearing sunglasses or masks.
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50/60 border border-emerald-100 text-emerald-900">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="block font-semibold">Vary Angles Slightly</strong>
+                        Tilt your head slightly up, down, left, and right to capture comprehensive features.
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-purple-50/60 border border-purple-100 text-purple-900">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-purple-600 shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="block font-semibold">Automatic Stop at 100</strong>
+                        Once 100 samples are saved, the stream will indicate completion. You can then navigate to <strong>Train Model</strong>.
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-200">
+                <a href="{{ url_for('train_page') }}" class="w-full py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i> Done? Train Classifier Model
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+# Core Face Recognition & Computer Vision (includes LBPH Face Recognizer)
+opencv-contrib-python>=4.8.0.76
+
+# Image Processing & Grayscale Conversion for Training
+Pillow>=10.0.0
+
+# Database Driver for MySQL Persistence
+mysql-connector-python>=8.0.33
+
+# Numerical Computation & Array Handling for OpenCV matrices
+numpy>=1.24.3
+
+# Web Application Framework
+flask>=3.0.0

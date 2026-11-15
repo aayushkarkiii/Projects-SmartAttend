@@ -21,13 +21,10 @@ class Register:
         self.var_cpwd=StringVar()
         self.var_check=IntVar()
 
-        self.bg=ImageTk.PhotoImage(file=r"S:\Project-II\Images_GUI\bgReg.jpg")
-        
-        lb1_bg=Label(self.root,image=self.bg)
-        lb1_bg.place(x=0,y=0, relwidth=1,relheight=1)
+        self.root.configure(bg="#0f172a")
 
         frame= Frame(self.root,bg="#F2F2F2")
-        frame.place(x=100,y=80,width=900,height=580)
+        frame.place(relx=0.5,rely=0.5,anchor="center",width=900,height=580)
         
 
       

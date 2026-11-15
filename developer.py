@@ -1,96 +1,116 @@
-from tkinter import*
+from tkinter import *
 from tkinter import ttk
-from train import Train
-from PIL import Image,ImageTk
-from student import Student
-from train import Train
-from face_recognition import Face_Recognition
-from attendance import Attendance
-import os
+
 
 class Developer:
-    def __init__(self,root):
-        self.root=root
-        self.root.geometry("1366x768+0+0")
-        self.root.title("Face_Recogonition_System")
+    def __init__(self, root):
+        self.root = root
+        self.root.geometry("1100x700+130+50")
+        self.root.title("Developer Information & Credits")
+        self.root.configure(bg="#f8fafc")
 
-# This part is image labels setting start 
-        # first header image  
-        img=Image.open(r"S:\Project-II\Images_GUI\banner.jpg")
-        img=img.resize((1366,130),Image.LANCZOS)
-        self.photoimg=ImageTk.PhotoImage(img)
+        # Header banner frame
+        header_frame = Frame(self.root, bg="#1e3a8a", height=85)
+        header_frame.pack(fill="x", side="top")
+        header_frame.pack_propagate(False)
 
-        # set image as lable
-        f_lb1 = Label(self.root,image=self.photoimg)
-        f_lb1.place(x=0,y=0,width=1366,height=130)
+        title_lb1 = Label(
+            header_frame,
+            text="PROJECT DEVELOPERS & CONTRIBUTORS",
+            font=("Segoe UI", 22, "bold"),
+            bg="#1e3a8a",
+            fg="white"
+        )
+        title_lb1.pack(pady=(12, 2))
 
-        # backgorund image 
-        bg1=Image.open(r"S:\Project-II\Images_GUI\bg4.png")
-        bg1=bg1.resize((1366,768),Image.LANCZOS)
-        self.photobg1=ImageTk.PhotoImage(bg1)
+        subtitle_lb1 = Label(
+            header_frame,
+            text="Smart Face Recognition Attendance System Engineering Team",
+            font=("Segoe UI", 10),
+            bg="#1e3a8a",
+            fg="#bfdbfe"
+        )
+        subtitle_lb1.pack()
 
-        # set image as lable
-        bg_img = Label(self.root,image=self.photobg1)
-        bg_img.place(x=0,y=130,width=1366,height=768)
+        # Center Container
+        main_container = Frame(self.root, bg="#f8fafc")
+        main_container.pack(expand=True, fill="both", padx=50, pady=40)
 
+        card = Frame(main_container, bg="#ffffff", bd=1, relief="solid", padx=40, pady=30)
+        card.pack(expand=True)
 
-        #title section
-        title_lb1 = Label(bg_img,text="Developer Pannel",font=("verdana",30,"bold"),bg="white",fg="navyblue")
-        title_lb1.place(x=0,y=0,width=1366,height=45)
+        card_title = Label(
+            card,
+            text="CORE DEVELOPMENT TEAM",
+            font=("Segoe UI", 16, "bold"),
+            bg="#ffffff",
+            fg="#1e3a8a"
+        )
+        card_title.pack(pady=(0, 25))
 
-        # Create buttons below the section 
-        # ------------------------------------------------------------------------------------------------------------------- 
-        # student button 1
-        std_img_btn=Image.open(r"S:\Project-II\Images_GUI\noprofile.jpg")
-        std_img_btn=std_img_btn.resize((180,180),Image.LANCZOS)
-        self.std_img1=ImageTk.PhotoImage(std_img_btn)
+        # Developers Container
+        devs_frame = Frame(card, bg="#ffffff")
+        devs_frame.pack()
 
-        std_b1 = Button(bg_img,image=self.std_img1,cursor="hand2")
-        std_b1.place(x=250,y=200,width=180,height=180)
+        devs = [
+            ("Aayush Karki", "Lead Developer / ML & Architecture", "#2563eb"),
+            ("Basanta Bist", "Core Developer / Backend & Database", "#059669"),
+            ("Keshav Dahal", "Core Developer / GUI & Integration", "#0284c7")
+        ]
 
-        std_b1_1 = Button(bg_img,text="Aayush karki",cursor="hand2",font=("tahoma",15,"bold"),bg="white",fg="navyblue")
-        std_b1_1.place(x=250,y=380,width=180,height=45)
+        for name, role, color in devs:
+            dev_box = Frame(devs_frame, bg="#f1f5f9", bd=1, relief="solid", padx=20, pady=20, width=240, height=180)
+            dev_box.pack(side="left", padx=15)
+            dev_box.pack_propagate(False)
 
-        # Detect Face  button 2
-        det_img_btn=Image.open(r"S:\Project-II\Images_GUI\noprofile.jpg")
-        det_img_btn=det_img_btn.resize((180,180),Image.LANCZOS)
-        self.det_img1=ImageTk.PhotoImage(det_img_btn)
+            # Avatar placeholder badge
+            initials = "".join([part[0] for part in name.split()])
+            badge = Label(
+                dev_box,
+                text=initials,
+                font=("Segoe UI", 16, "bold"),
+                bg=color,
+                fg="white",
+                width=4,
+                height=2
+            )
+            badge.pack(pady=(5, 10))
 
-        det_b1 = Button(bg_img,image=self.det_img1,cursor="hand2",)
-        det_b1.place(x=480,y=200,width=180,height=180)
+            name_lbl = Label(
+                dev_box,
+                text=name,
+                font=("Segoe UI", 13, "bold"),
+                bg="#f1f5f9",
+                fg="#0f172a"
+            )
+            name_lbl.pack()
 
-        det_b1_1 = Button(bg_img,text="Basanta Bist",cursor="hand2",font=("tahoma",15,"bold"),bg="white",fg="navyblue")
-        det_b1_1.place(x=480,y=380,width=180,height=45)
+            role_lbl = Label(
+                dev_box,
+                text=role,
+                font=("Segoe UI", 9),
+                bg="#f1f5f9",
+                fg="#64748b",
+                wraplength=210,
+                justify="center"
+            )
+            role_lbl.pack(pady=(4, 0))
 
-         # Attendance System  button 3
-        att_img_btn=Image.open(r"S:\Project-II\Images_GUI\noprofile.jpg")
-        att_img_btn=att_img_btn.resize((180,180),Image.LANCZOS)
-        self.att_img1=ImageTk.PhotoImage(att_img_btn)
+        # Project Info section
+        info_frame = Frame(card, bg="#f8fafc", bd=1, relief="solid", padx=20, pady=12)
+        info_frame.pack(fill="x", pady=(30, 0))
 
-        att_b1 = Button(bg_img,image=self.att_img1,cursor="hand2",)
-        att_b1.place(x=710,y=200,width=180,height=180)
-
-        att_b1_1 = Button(bg_img,text="Keshav Dahal",cursor="hand2",font=("tahoma",15,"bold"),bg="white",fg="navyblue")
-        att_b1_1.place(x=710,y=380,width=180,height=45)
-
-         # Help  Support  button 4
-        hlp_img_btn=Image.open(r"S:\Project-II\Images_GUI\noprofile.jpg")
-        hlp_img_btn=hlp_img_btn.resize((180,180),Image.LANCZOS)
-        self.hlp_img1=ImageTk.PhotoImage(hlp_img_btn)
-
-        # hlp_b1 = Button(bg_img,image=self.hlp_img1,cursor="hand2",)
-        # hlp_b1.place(x=940,y=200,width=180,height=180)
-
-        # hlp_b1_1 = Button(bg_img,text="Maria Khan",cursor="hand2",font=("tahoma",15,"bold"),bg="white",fg="navyblue")
-        # hlp_b1_1.place(x=940,y=380,width=180,height=45)
+        info_text = Label(
+            info_frame,
+            text="Technologies: Python 3.12 | OpenCV LBPH | Tkinter | MySQL Database",
+            font=("Segoe UI", 10, "bold"),
+            bg="#f8fafc",
+            fg="#475569"
+        )
+        info_text.pack()
 
 
 if __name__ == "__main__":
-    root=Tk()
-    obj=Developer(root)
+    root = Tk()
+    obj = Developer(root)
     root.mainloop()
-
-
-
-
-

@@ -1,55 +1,185 @@
-# Face Attendance System
+# Smart Face Attendance System
 
-A desktop attendance management app that uses face recognition to mark students present. Built with Python, Tkinter, OpenCV, and MySQL.
+A modern, browser-based facial recognition attendance management system built with **Python 3.12**, **Flask**, **OpenCV (LBPH)**, **SQLite / MySQL**, and **Tailwind CSS**.
 
-The idea is simple — register students, capture their face photos, train a recognizer model, and then let the system automatically identify them via webcam and log attendance.
+The system enables schools and universities to register students, automatically capture 100 webcam face training samples, train a Local Binary Patterns Histogram (LBPH) classifier model (`coc.xml`), and identify students in real time via live video stream to log attendance automatically.
 
-## How it works
+---
 
-1. **Register/Login** — Teachers register with email and password. Login opens the main dashboard.
-2. **Add Students** — Enter student details (name, roll number, department, etc.) through the Student Panel.
-3. **Capture Faces** — Take 100 face samples per student using the webcam. Images are saved as grayscale crops in `data_img/`.
-4. **Train Model** — Train an LBPH (Local Binary Patterns Histogram) face recognizer on the captured images. The trained model is saved as `coc.xml`.
-5. **Detect & Mark Attendance** — Run face detection via webcam. Recognized faces are matched against the database and attendance is logged to `attendance.csv` with timestamp.
-6. **View/Export Attendance** — Import or export attendance records as CSV. Attendance is also stored in MySQL for persistence.
+## 📸 Application Screenshots
 
-## Project structure
+### 1. Central Control Center & Dashboard
+Real-time summary metrics, quick navigation cards in series, and live today's attendance table.
+
+![Dashboard Overview](assets/screenshots/02_dashboard.png)
+
+---
+
+### 2. Live Facial Recognition & Attendance Detector
+Live MJPEG webcam stream detecting faces with Haar Cascades, verifying identity via trained LBPH model, and streaming newly logged attendees in real time.
+
+---
+
+### 3. Student Management & Directory
+Add, update, search, and delete student records with instant status indicators for face dataset enrollment.
+
+![Student Directory](assets/screenshots/03_students.png)
+
+---
+
+### 4. LBPH Model Classifier Training
+Compile all 100-sample student face datasets in `data_img/` into the production recognizer model (`coc.xml`).
+
+![Train Model](assets/screenshots/05_train.png)
+
+---
+
+### 5. Attendance Records & CSV Export
+Filter historical and daily attendance records by date, verify timestamps, and export attendance records directly as a CSV file.
+
+![Attendance Records Log](assets/screenshots/06_attendance.png)
+
+---
+
+### 6. Teacher Portal Authentication
+Secure session-based sign-in for faculty with security-question password recovery.
+
+![Teacher Portal Sign In](assets/screenshots/01_login.png)
+
+---
+
+### 7. Development & Engineering Team
+Project contributors, technology stack specifications, and system architecture.
+
+![Developer Team](assets/screenshots/07_developers.png)
+
+---
+
+## 🚀 Key Features & Architectural Upgrades
+
+- **Native Web Streaming (MJPEG):** Camera video stream is delivered directly over HTTP (`multipart/x-mixed-replace`) with bounding boxes and recognition overlays.
+- **In-Memory Caching:** Cached student records in memory during live video recognition to eliminate per-frame database query bottlenecks.
+- **Debounced Attendance Marking:** Automatically prevents duplicate attendance writes with a configurable 5-minute cooldown per student.
+- **Zero-Config Database:** Automatically initializes local SQLite (`face_recognition.db`) out-of-the-box with optional MySQL database fallback.
+- **Responsive UI:** Built with Tailwind CSS and Lucide icons for desktop, tablet, and mobile responsiveness.
+
+---
+
+## 🛠️ System Architecture & Workflow
+
+```mermaid
+flowchart LR
+    A["1. Register Student\n(Student Directory)"] --> B["2. Capture 100 Samples\n(Webcam Auto-Capture)"]
+    B --> C["3. Train Classifier\n(LBPH -> coc.xml)"]
+    C --> D["4. Live Recognition\n(Webcam Detector)"]
+    D --> E["5. Auto Log Attendance\n(CSV & Database)"]
+```
+
+1. **Teacher Sign In:** Login to the dashboard using teacher credentials.
+2. **Student Enrollment:** Register student profile (ID, Name, Roll, Department, Course, Contact).
+3. **Face Sampling:** Open camera view to automatically capture 100 grayscale face crops into `data_img/`.
+4. **Classifier Training:** One-click training compiling the LBPH recognizer to `coc.xml`.
+5. **Live Verification:** Real-time webcam identification marks students present with timestamp and confidence score.
+6. **Data Export:** View and export verified attendance records to `attendance.csv`.
+
+---
+
+## 📦 Project Structure
 
 ```
-├── loading.py            # Splash/startup screen
-├── login.py              # Login window + password reset
-├── register.py           # Teacher registration
-├── main.py               # Main dashboard (standalone entry)
-├── student.py            # Student CRUD panel
-├── train.py              # Train the face recognizer
-├── face_recognition.py   # Webcam face detection + attendance marking
-├── attendance.py         # View, import/export attendance records
-├── developer.py          # Developer credits page
-├── databaseTest.py       # Quick script to test MySQL connection
-├── haarcascade_frontalface_default.xml  # OpenCV Haar cascade for face detection
-├── attendance.csv        # Attendance log (auto-generated)
-└── data_img/             # Face sample images (created at runtime)
+Projects-SmartAttend/
+├── app.py                              # Flask Web Server & API Controllers (Port 5050)
+├── camera.py                           # OpenCV Video Streaming, Detection & LBPH Recognizer
+├── database.py                         # SQLite / MySQL Data Access Layer
+├── face_recognition.db                 # Auto-initialized SQLite Database
+├── haarcascade_frontalface_default.xml # OpenCV Haar Feature Cascade Model
+├── attendance.csv                      # Flat-file Attendance Storage
+├── requirements.txt                    # Production Dependencies Manifest
+├── pyproject.toml                      # Build System & Packaging Metadata
+│
+├── templates/                          # Tailwind CSS HTML5 Web Interface
+│   ├── base.html                       # Global Layout, Navigation & Lucide Icons
+│   ├── dashboard.html                  # Metric Cards, Operations & Today's Stream
+│   ├── login.html                      # Teacher Authentication Portal
+│   ├── register.html                   # Faculty Account Registration
+│   ├── forgot_password.html            # Security Question Password Reset
+│   ├── students.html                   # Student Directory Table & Registration Modal
+│   ├── capture.html                    # Live Webcam Dataset Capture (1 to 100)
+│   ├── detector.html                   # Real-Time Webcam Face Recognition Feed
+│   ├── train.html                      # Model Compilation & Status Monitor
+│   ├── attendance.html                 # Attendance Log Table & CSV Export
+│   └── developers.html                 # Team Credits & Specs
+│
+├── assets/
+│   └── screenshots/                    # High-resolution Application Previews
+│       ├── 01_login.png
+│       ├── 02_dashboard.png
+│       ├── 03_students.png
+│       ├── 05_train.png
+│       ├── 06_attendance.png
+│       └── 07_developers.png
+│
+├── data_img/                           # 100 Grayscale Face Samples per Student
+│
+└── Desktop GUI Modules (Legacy Support)
+    ├── main.py                         # Desktop Series Dashboard
+    ├── student.py                      # Desktop Student Management
+    ├── face_recognition.py             # Desktop Face Detector
+    ├── train.py                        # Desktop Model Trainer
+    ├── attendance.py                   # Desktop Attendance Viewer
+    └── login.py                        # Desktop Login Window
 ```
 
-## Prerequisites
+---
 
-- Python 3.x
-- MySQL server running locally
-- A webcam
+## ⚡ Quick Start
 
-## Setup
-
-### 1. Install Python packages
+### 1. Clone & Setup Environment
 
 ```bash
-pip install opencv-contrib-python numpy pillow mysql-connector-python
+# Clone the repository
+git clone https://github.com/aayushkarki/Projects-SmartAttend.git
+cd Projects-SmartAttend
+
+# Create and activate Python 3.12 virtual environment
+uv venv .venv --python 3.12
+source .venv/bin/activate
 ```
 
-`opencv-contrib-python` is needed (not just `opencv-python`) because the LBPH face recognizer lives in the contrib modules.
+### 2. Install Dependencies
 
-### 2. Set up the MySQL database
+```bash
+uv pip install -r requirements.txt
+```
 
-Connect to your MySQL server and run:
+### 3. Launch the Web Application
+
+```bash
+python app.py
+```
+
+Open your browser and navigate to:
+👉 **`http://127.0.0.1:5050`**
+
+---
+
+## 🔑 Preloaded Demo Credentials
+
+For testing and demonstration, use the pre-configured administrator account:
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Faculty Administrator** | `admin@school.com` | `admin123` |
+
+*(You can also register a new account from the registration page).*
+
+---
+
+## 🗄️ Database Configuration
+
+By default, the application runs on **SQLite** (`face_recognition.db`) with zero setup required.
+
+If you prefer connecting to a local **MySQL** server (`localhost:3306`), create the database schema:
 
 ```sql
 CREATE DATABASE face_recognition;
@@ -84,6 +214,7 @@ CREATE TABLE regteach (
 );
 
 CREATE TABLE stdattendance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     std_id VARCHAR(20),
     std_roll_no VARCHAR(20),
     std_name VARCHAR(100),
@@ -93,71 +224,27 @@ CREATE TABLE stdattendance (
 );
 ```
 
-### 3. Update database credentials
+---
 
-The code connects to MySQL with `user='root'` and `password='admin'` on `localhost:3306`. If yours are different, update the connection strings in the Python files.
+## 🖥️ Running Desktop GUI (Alternative)
 
-### 4. Download required XML files
-
-Download `clf.xml` and `coc.xml` (pre-trained recognizer models) from:
-
-**https://mega.nz/folder/Py4FTKjZ#Y3xzOdi6R1Rohq7pVXFRUA**
-
-Place both files in the project root directory. (You can also generate `coc.xml` yourself by training — see below.)
-
-### 5. Update image paths
-
-The GUI loads banner/background images from hardcoded Windows paths (e.g., `S:\Project-II\Images_GUI\...`). You'll need to either:
-- Create an `Images_GUI` folder with your own images and update the paths in the code, or
-- Comment out the image-loading lines if you just want it to run
-
-### 6. Create the dataset folder
+To launch the desktop Tkinter interface instead of the web application:
 
 ```bash
-mkdir data_img
-```
-
-## Running
-
-Start from the loading screen:
-
-```bash
-python loading.py
-```
-
-Or jump straight to the login:
-
-```bash
-python login.py
-```
-
-Or skip auth entirely and open the main dashboard:
-
-```bash
+source .venv/bin/activate
 python main.py
 ```
 
-### Taking attendance
+---
 
-1. Open **Student Panel** → fill in student details → click **Take Pic**
-2. The webcam opens and captures 100 face samples automatically. Press Enter to stop early.
-3. Go to **Data Train** → click **Train Dataset**. Wait for it to finish.
-4. Go to **Face Detector** → click **Face Detector**. The webcam opens and identifies registered faces in real time. Press Enter to close.
-5. Check `attendance.csv` or the **Attendance** panel for records.
+## 👥 Developers & Contributors
 
-## Built with
+- **Aayush Karki** — Lead Developer (Architecture, Computer Vision & Backend)
+- **Basanta Bist** — Core Developer (Database Models & Attendance Synchronizer)
+- **Keshav Dahal** — Core Developer (Frontend UI & Integration)
 
-- **Tkinter** — GUI
-- **OpenCV** — Face detection (Haar cascades) and recognition (LBPH)
-- **MySQL** — Student records and attendance storage
-- **Pillow** — Image handling for the GUI
+---
 
-## Developers
+## 📄 License
 
-- Aayush Karki
-- Basanta Bist
-- Keshav Dahal
-
-## License
-
-MIT — see [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Train Face Classifier - SmartAttend{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">LBPH Classifier Model Training</h1>
+            <p class="text-sm text-slate-500 mt-0.5">Train OpenCV Local Binary Patterns Histogram (LBPH) recognizer on captured student datasets.</p>
+        </div>
+        <a href="{{ url_for('detector') }}" class="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition flex items-center gap-2 shadow-sm">
+            <i data-lucide="play" class="w-4 h-4"></i> Open Face Detector
+        </a>
+    </div>
+
+    <!-- Status Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sample Images Found</p>
+            <h3 class="text-3xl font-extrabold text-slate-900 mt-1">{{ total_images }}</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Stored in <code class="font-mono">data_img/</code></p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Students Enrolled</p>
+            <h3 class="text-3xl font-extrabold text-slate-900 mt-1">{{ students_represented }}</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Distinct student IDs in dataset</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Current Model Status</p>
+            <h3 class="text-lg font-bold {% if model_exists %}text-emerald-600{% else %}text-amber-600{% endif %} mt-2">
+                {% if model_exists %}Active (`coc.xml` Ready){% else %}No Trained Model{% endif %}
+            </h3>
+            {% if model_info %}
+            <p class="text-xs text-slate-400 mt-0.5">{{ model_info.mtime }} &bull; {{ model_info.size_kb }} KB</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Training Action Card -->
+    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center max-w-2xl mx-auto space-y-6">
+        <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
+            <i data-lucide="cpu" class="w-8 h-8"></i>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-bold text-slate-900">Compile & Train Recognizer</h2>
+            <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                Reads all 100 grayscale face matrices per student from <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">data_img/</code> and builds an LBPH classifier saved to <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-700">coc.xml</code>.
+            </p>
+        </div>
+
+        <!-- Progress Spinner (Hidden by default) -->
+        <div id="trainingSpinner" class="hidden py-4">
+            <div class="inline-flex items-center gap-3 px-4 py-2 rounded-lg bg-amber-50 text-amber-800 text-sm font-medium border border-amber-200">
+                <svg class="animate-spin h-5 w-5 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Training model on dataset... Please wait.</span>
+            </div>
+        </div>
+
+        <!-- Result Alert -->
+        <div id="trainResult" class="hidden p-4 rounded-xl text-sm font-medium"></div>
+
+        <div>
+            <button id="trainBtn" onclick="startTraining()" 
+                    class="py-3 px-8 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-md shadow-amber-600/25 transition inline-flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> Start Dataset Training
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function startTraining() {
+    const btn = document.getElementById('trainBtn');
+    const spinner = document.getElementById('trainingSpinner');
+    const resultBox = document.getElementById('trainResult');
+
+    btn.disabled = true;
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+    spinner.classList.remove('hidden');
+    resultBox.classList.add('hidden');
+
+    fetch('/api/train', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            spinner.classList.add('hidden');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            resultBox.classList.remove('hidden');
+
+            if (data.status === 'success') {
+                resultBox.className = 'p-4 rounded-xl text-sm font-medium bg-emerald-50 border border-emerald-200 text-emerald-800';
+                resultBox.innerHTML = `<strong>Success!</strong> ${data.message} <br><a href="/detector" class="underline font-bold mt-1 inline-block">Launch Face Detector &rarr;</a>`;
+            } else {
+                resultBox.className = 'p-4 rounded-xl text-sm font-medium bg-red-50 border border-red-200 text-red-800';
+                resultBox.innerHTML = `<strong>Training Error:</strong> ${data.message}`;
+            }
+        })
+        .catch(err => {
+            spinner.classList.add('hidden');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            resultBox.classList.remove('hidden');
+            resultBox.className = 'p-4 rounded-xl text-sm font-medium bg-red-50 border border-red-200 text-red-800';
+            resultBox.innerText = 'Network error during training request.';
+        });
+}
+</script>
+{% endblock %}

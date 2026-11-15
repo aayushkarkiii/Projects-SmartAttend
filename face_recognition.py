@@ -14,35 +14,84 @@ class Face_Recognition:
 
     def __init__(self,root):
         self.root=root
-        self.root.geometry("1366x768+0+0")
-        self.root.title("Face Recognition Pannel")
+        self.root.geometry("1100x700+130+50")
+        self.root.title("Face Recognition & Attendance Detection")
+        self.root.configure(bg="#f8fafc")
 
-        img=Image.open(r"S:\Project-II\Images_GUI\banner.jpg")
-        img=img.resize((1366,130),Image.ANTIALIAS)
-        self.photoimg=ImageTk.PhotoImage(img)
+        # Header banner frame
+        header_frame = Frame(self.root, bg="#1e3a8a", height=85)
+        header_frame.pack(fill="x", side="top")
+        header_frame.pack_propagate(False)
 
-        f_lb1 = Label(self.root,image=self.photoimg)
-        f_lb1.place(x=0,y=0,width=1366,height=130)
+        title_lb1 = Label(
+            header_frame,
+            text="LIVE FACE RECOGNITION SYSTEM",
+            font=("Segoe UI", 22, "bold"),
+            bg="#1e3a8a",
+            fg="white"
+        )
+        title_lb1.pack(pady=(12, 2))
 
-        bg1=Image.open(r"S:\Project-II\Images_GUI\bg2.jpg")
-        bg1=bg1.resize((1366,768),Image.ANTIALIAS)
-        self.photobg1=ImageTk.PhotoImage(bg1)
+        subtitle_lb1 = Label(
+            header_frame,
+            text="Real-Time Webcam Face Verification & Automated Attendance Logging",
+            font=("Segoe UI", 10),
+            bg="#1e3a8a",
+            fg="#bfdbfe"
+        )
+        subtitle_lb1.pack()
 
-        bg_img = Label(self.root,image=self.photobg1)
-        bg_img.place(x=0,y=130,width=1366,height=768)
+        # Center Card Container
+        main_container = Frame(self.root, bg="#f8fafc")
+        main_container.pack(expand=True, fill="both", padx=40, pady=40)
 
-        title_lb1 = Label(bg_img,text="Welcome to Face Recognition Pannel",font=("verdana",30,"bold"),bg="white",fg="navyblue")
-        title_lb1.place(x=0,y=0,width=1366,height=45)
+        card = Frame(main_container, bg="#ffffff", bd=1, relief="solid", padx=50, pady=40)
+        card.pack(expand=True)
 
-        std_img_btn=Image.open(r"S:\Project-II\Images_GUI\f_det.jpg")
-        std_img_btn=std_img_btn.resize((180,180),Image.ANTIALIAS)
-        self.std_img1=ImageTk.PhotoImage(std_img_btn)
+        card_title = Label(
+            card,
+            text="CAMERA DETECTOR MODULE",
+            font=("Segoe UI", 16, "bold"),
+            bg="#ffffff",
+            fg="#047857"
+        )
+        card_title.pack(pady=(0, 10))
 
-        std_b1 = Button(bg_img,command=self.face_recog,image=self.std_img1,cursor="hand2")
-        std_b1.place(x=600,y=170,width=180,height=180)
+        info_lbl = Label(
+            card,
+            text="Click below to open webcam and detect student faces.\nRecognized students will be marked Present in attendance.csv and MySQL.",
+            font=("Segoe UI", 11),
+            bg="#ffffff",
+            fg="#475569",
+            justify="center"
+        )
+        info_lbl.pack(pady=(0, 25))
 
-        std_b1_1 = Button(bg_img,command=self.face_recog,text="Face Detector",cursor="hand2",font=("tahoma",15,"bold"),bg="white",fg="navyblue")
-        std_b1_1.place(x=600,y=350,width=180,height=45)
+        btn_detect = Button(
+            card,
+            command=self.face_recog,
+            text="Launch Face Detector (Webcam)",
+            font=("Segoe UI", 13, "bold"),
+            bg="#047857",
+            fg="white",
+            activebackground="#065f46",
+            activeforeground="white",
+            bd=0,
+            relief="flat",
+            cursor="hand2",
+            height=2,
+            width=32
+        )
+        btn_detect.pack(pady=(0, 20))
+
+        hint_lbl = Label(
+            card,
+            text="Tip: While camera window is active, press Enter to close the stream.",
+            font=("Segoe UI", 9, "italic"),
+            bg="#ffffff",
+            fg="#94a3b8"
+        )
+        hint_lbl.pack()
     
 
     def mark_attendance(self,i,r,n):

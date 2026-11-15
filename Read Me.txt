@@ -1,8 +1,0 @@
-Requirements Install Project 
------------------------------
-Use your own suitable IDE
--Use mysqla as database
--Use any python version but udate library or package 
--Download Xml files from following links
-"https://mega.nz/folder/Py4FTKjZ#Y3xzOdi6R1Rohq7pVXFRUA"
-paste it both  xml files on project folder directly

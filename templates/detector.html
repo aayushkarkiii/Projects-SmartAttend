@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Live Face Recognition & Attendance - SmartAttend{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Live Face Attendance Detector</h1>
+            <p class="text-sm text-slate-500 mt-0.5">Real-time facial identification, student verification, and automated attendance logging.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('attendance') }}" class="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium transition flex items-center gap-2">
+                <i data-lucide="clipboard-list" class="w-4 h-4"></i> View Log Sheet
+            </a>
+            {% if not model_exists %}
+            <a href="{{ url_for('train_page') }}" class="px-4 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold transition flex items-center gap-2 shadow-sm animate-pulse">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i> Train Model First
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not model_exists %}
+    <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 shrink-0"></i>
+            <div>
+                <strong>Model Not Trained:</strong> The LBPH model file (<code class="font-mono text-amber-800">coc.xml</code>) has not been trained yet. Faces will be detected, but student names won't be recognized until you train the classifier.
+            </div>
+        </div>
+        <a href="{{ url_for('train_page') }}" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-lg transition shrink-0">
+            Train Model Now
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Live Stream & Detection Feed -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Live Webcam Feed Window -->
+        <div class="lg:col-span-2 bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-xl relative flex items-center justify-center min-h-[480px]">
+            <img src="{{ url_for('video_feed_detector') }}" 
+                 alt="Live Face Recognition Video Feed" 
+                 class="w-full h-auto object-contain max-h-[600px] rounded-2xl">
+            
+            <div class="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-700 text-xs text-white">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Recognition Engine Active</span>
+            </div>
+        </div>
+
+        <!-- Live Real-Time Attendance Feed Card -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-[520px]">
+            <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm">Real-Time Attendee Feed</h3>
+                    <p class="text-[11px] text-slate-400">Auto-logged on positive recognition</p>
+                </div>
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live
+                </span>
+            </div>
+
+            <div id="attendeesList" class="flex-1 p-4 overflow-y-auto space-y-2.5">
+                <div class="text-center py-12 text-slate-400 text-xs">
+                    <i data-lucide="scan" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
+                    Waiting for student face verification...
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-slate-200 bg-slate-50 text-[11px] text-slate-500 text-center rounded-b-xl">
+                Attendance is recorded to <code class="text-slate-700">attendance.csv</code> & SQLite DB.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Poll for live attendees every 2 seconds
+    function pollAttendees() {
+        fetch('/api/recent_attendees')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('attendeesList');
+                if (!data || data.length === 0) {
+                    return;
+                }
+                container.innerHTML = '';
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'p-3 rounded-lg border border-slate-100 bg-slate-50/80 flex items-center justify-between transition hover:bg-slate-100';
+                    card.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                                ${item.name.charAt(0)}
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-xs text-slate-900">${item.name}</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">ID: ${item.student_id} &bull; Roll: ${item.roll_no}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] font-mono font-medium text-emerald-600 block">${item.time}</span>
+                            <span class="text-[9px] text-slate-400">${item.date}</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            })
+            .catch(err => console.log('Polling error:', err));
+    }
+
+    setInterval(pollAttendees, 2000);
+    pollAttendees();
+</script>
+{% endblock %}

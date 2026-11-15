@@ -32,35 +32,23 @@ class Attendance:
         self.var_date=StringVar()
         self.var_attend=StringVar()
 
-        # This part is image labels setting start 
-        # first header image  
-        img=Image.open(r"S:\Project-II\Images_GUI\banner.jpg")
-        img=img.resize((1366,130),Image.LANCZOS)
-        self.photoimg=ImageTk.PhotoImage(img)
+        # Header banner frame
+        header_frame = Frame(self.root, bg="#1e3a8a", height=80)
+        header_frame.pack(fill="x", side="top")
+        header_frame.pack_propagate(False)
 
-        # set image as label
-        f_lb1 = Label(self.root,image=self.photoimg)
-        f_lb1.place(x=0,y=0,width=1366,height=130)
+        title_lb1 = Label(header_frame, text="ATTENDANCE MANAGEMENT PANEL", font=("verdana", 22, "bold"), bg="#1e3a8a", fg="white")
+        title_lb1.pack(pady=20)
 
-        # backgorund image 
-        bg1=Image.open(r"S:\Project-II\Images_GUI\bg2.jpg")
-        bg1=bg1.resize((1366,768),Image.LANCZOS)
-        self.photobg1=ImageTk.PhotoImage(bg1)
-
-        # set image as label
-        bg_img = Label(self.root,image=self.photobg1)
-        bg_img.place(x=0,y=130,width=1366,height=768)
-
-
-        #title section
-        title_lb1 = Label(bg_img,text="Welcome to Attendance Pannel",font=("verdana",30,"bold"),bg="white",fg="navyblue")
-        title_lb1.place(x=0,y=0,width=1366,height=45)
+        # Main background container
+        bg_img = Frame(self.root, bg="#f8fafc")
+        bg_img.pack(fill="both", expand=True)
 
         #========================Section Creating==================================
 
         # Creating Frame 
-        main_frame = Frame(bg_img,bd=2,bg="white") #bd mean border 
-        main_frame.place(x=5,y=55,width=1355,height=510)
+        main_frame = Frame(bg_img, bd=2, bg="white") #bd mean border 
+        main_frame.place(x=5, y=10, width=1355, height=640)
 
         # Left Label Frame 
         left_frame = LabelFrame(main_frame,bd=2,bg="white",relief=RIDGE,text="Student Details",font=("verdana",12,"bold"),fg="navyblue")
