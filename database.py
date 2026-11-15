@@ -67,10 +67,13 @@ def init_db():
     # Create default demo teacher account if none exists
     cursor.execute("SELECT COUNT(*) FROM regteach")
     if cursor.fetchone()[0] == 0:
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@school.com")
+        admin_pwd = os.environ.get("ADMIN_PASSWORD", "admin123")
+        admin_contact = os.environ.get("ADMIN_CONTACT", "9800000000")
         cursor.execute("""
             INSERT INTO regteach (fname, lname, contact, email, ssq, sa, pwd)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, ("Admin", "Teacher", "9800000000", "admin@school.com", "Your Pet Name", "Leo", "admin123"))
+        """, ("Admin", "Teacher", admin_contact, admin_email, "Your Pet Name", "Leo", admin_pwd))
 
     conn.commit()
     conn.close()

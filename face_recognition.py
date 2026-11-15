@@ -10,6 +10,7 @@ from tkinter import messagebox
 from time import strftime
 from datetime import datetime
 import face_recognition
+from db_config import get_mysql_connection
 class Face_Recognition:
 
     def __init__(self,root):
@@ -127,7 +128,7 @@ class Face_Recognition:
 
                 # threshold = 50 
 
-                conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
+                conn = get_mysql_connection()
                 cursor = conn.cursor()
 
                 cursor.execute("select Name from student where Student_ID="+str(id))

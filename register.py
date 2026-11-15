@@ -3,6 +3,7 @@ from tkinter import ttk
 from PIL import Image,ImageTk
 from tkinter import messagebox
 import mysql.connector
+from db_config import get_mysql_connection
 
 class Register:
     def __init__(self,root):
@@ -139,7 +140,7 @@ class Register:
         else:
             # messagebox.showinfo("Successfully","Successfully Register!")
             try:
-                conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
+                conn = get_mysql_connection()
                 mycursor = conn.cursor()
                 query=("select * from regteach where email=%s")
                 value=(self.var_email.get(),)

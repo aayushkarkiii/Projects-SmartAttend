@@ -175,6 +175,28 @@ For testing and demonstration, use the pre-configured administrator account:
 
 ---
 
+## ⚙️ Environment Configuration
+
+Copy the example environment configuration to set your credentials securely:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `SECRET_KEY` | *(Auto-generated)* | Flask session encryption key |
+| `PORT` | `5050` | Web application port |
+| `ADMIN_EMAIL` | `admin@school.com` | Default demo teacher email |
+| `ADMIN_PASSWORD` | `admin123` | Default demo teacher password |
+| `MYSQL_HOST` | `localhost` | MySQL hostname (optional) |
+| `MYSQL_PORT` | `3306` | MySQL port (optional) |
+| `MYSQL_USER` | `root` | MySQL username (optional) |
+| `MYSQL_PASSWORD` | `""` | MySQL password (optional) |
+| `MYSQL_DATABASE` | `face_recognition` | MySQL database name |
+
+---
+
 ## 🗄️ Database Configuration
 
 By default, the application runs on **SQLite** (`face_recognition.db`) with zero setup required.

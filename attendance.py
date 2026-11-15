@@ -6,6 +6,7 @@ from tkinter import ttk
 from PIL import Image,ImageTk
 import os
 import mysql.connector
+from db_config import get_mysql_connection
 import cv2
 import numpy as np
 from tkinter import messagebox
@@ -230,7 +231,7 @@ class Attendance:
             try:
                 Update=messagebox.askyesno("Update","Do you want to Update this Student Attendance!",parent=self.root)
                 if Update > 0:
-                    conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
+                    conn = get_mysql_connection()
                     mycursor = conn.cursor()
                     mycursor.execute("update stdattendance set std_id=%s,std_roll_no=%s,std_name=%s,std_time=%s,std_date=%s,std_attendance=%s where std_id=%s",( 
                     self.var_id.get(),
@@ -258,7 +259,7 @@ class Attendance:
             try:
                 delete=messagebox.askyesno("Delete","Do you want to Delete?",parent=self.root)
                 if delete>0:
-                    conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
+                    conn = get_mysql_connection()
                     mycursor = conn.cursor() 
                     sql="delete from stdattendance where std_id=%s"
                     val=(self.var_id.get(),)
@@ -276,7 +277,7 @@ class Attendance:
     # ===========================fatch data form mysql attendance===========
 
     def fetch_data(self):
-        conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
+        conn = get_mysql_connection()
         mycursor = conn.cursor()
 
         mycursor.execute("select * from stdattendance")
@@ -369,7 +370,7 @@ class Attendance:
             messagebox.showerror("Error","Please Fill All Fields are Required!",parent=self.root)
         else:
             try:
-                conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
+                conn = get_mysql_connection()
                 mycursor = conn.cursor()
                 mycursor.execute("insert into stdattendance values(%s,%s,%s,%s,%s,%s)",(
                 self.var_id.get(),
@@ -392,7 +393,7 @@ class Attendance:
 
 
 
-    #     conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
+    #     conn = get_mysql_connection()
     #     mycursor = conn.cursor()
     #     if messagebox.askyesno("Confirmation","Are you sure you want to save attendance on database?"):
     #         for i in mydata:

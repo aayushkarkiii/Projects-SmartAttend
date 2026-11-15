@@ -8,7 +8,7 @@ import database
 import camera
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get("SECRET_KEY", os.urandom(24))
 
 
 def login_required(view):

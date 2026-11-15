@@ -6,6 +6,7 @@ import mysql.connector
 from main import Face_Recognition_System
 import os
 import sys
+from db_config import get_mysql_connection
 
 
 
@@ -72,34 +73,30 @@ class Login:
     def login(self):
         if (self.txtuser.get()=="" or self.txtpwd.get()==""):
             messagebox.showerror("Error","All Field Required!")
-        elif(self.txtuser.get()=="admin" and self.txtpwd.get()=="admin"):
-            messagebox.showinfo("Sussessfully","Welcome to Attendance Managment System Using Facial Recognition")
-            self.root.destroy()
-            sys.exit
-
         else:
-            # messagebox.showerror("Error","Please Check Username or Password !")
-            conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
-            mycursor = conn.cursor()
-            mycursor.execute("select * from regteach where email=%s and pwd=%s",(
-                self.txtuser.get(),
-                self.txtpwd.get()
-            ))
-            row=mycursor.fetchone()
-            if row==None:
-                messagebox.showerror("Error","Invalid Username and Password!")
-            else:
-                open_min=messagebox.askyesno("YesNo","Access only Admin")
-                if open_min>0:
-                    # self.root.destroy()
-                    self.new_window=Toplevel(self.root)
-                    self.app=Face_Recognition_System(self.new_window)
-                    
+            try:
+                conn = get_mysql_connection()
+                mycursor = conn.cursor()
+                mycursor.execute("select * from regteach where email=%s and pwd=%s",(
+                    self.txtuser.get(),
+                    self.txtpwd.get()
+                ))
+                row=mycursor.fetchone()
+                if row==None:
+                    messagebox.showerror("Error","Invalid Username and Password!")
                 else:
-                    if not open_min:
-                        return
-            conn.commit()
-            conn.close()
+                    open_min=messagebox.askyesno("YesNo","Access only Admin")
+                    if open_min>0:
+                        # self.root.destroy()
+                        self.new_window=Toplevel(self.root)
+                        self.app=Face_Recognition_System(self.new_window)
+                    else:
+                        if not open_min:
+                            return
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                messagebox.showerror("Database Error", f"Unable to connect to database: {e}")
 
             
 #=======================Reset Passowrd Function=============================
@@ -111,23 +108,25 @@ class Login:
         elif(self.var_pwd.get()==""):
             messagebox.showerror("Error","Please Enter the New Password!",parent=self.root2)
         else:
-            conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
-            mycursor = conn.cursor()
-            query=("select * from regteach where email=%s and ssq=%s and sa=%s")
-            value=(self.txtuser.get(),self.var_ssq.get(),self.var_sa.get())
-            mycursor.execute(query,value)
-            row=mycursor.fetchone()
-            if row==None:
-                messagebox.showerror("Error","Please Enter the Correct Answer!",parent=self.root2)
-            else:
-                query=("update regteach set pwd=%s where email=%s")
-                value=(self.var_pwd.get(),self.txtuser.get())
+            try:
+                conn = get_mysql_connection()
+                mycursor = conn.cursor()
+                query=("select * from regteach where email=%s and ssq=%s and sa=%s")
+                value=(self.txtuser.get(),self.var_ssq.get(),self.var_sa.get())
                 mycursor.execute(query,value)
+                row=mycursor.fetchone()
+                if row==None:
+                    messagebox.showerror("Error","Please Enter the Correct Answer!",parent=self.root2)
+                else:
+                    query=("update regteach set pwd=%s where email=%s")
+                    value=(self.var_pwd.get(),self.txtuser.get())
+                    mycursor.execute(query,value)
 
-                conn.commit()
-                conn.close()
-                messagebox.showinfo("Info","Successfully Your password has been reset, Please login with new Password!",parent=self.root2)
-                
+                    conn.commit()
+                    conn.close()
+                    messagebox.showinfo("Info","Successfully Your password has been reset, Please login with new Password!",parent=self.root2)
+            except Exception as e:
+                messagebox.showerror("Database Error", f"Unable to connect to database: {e}", parent=self.root2)
 
 
 
@@ -136,18 +135,19 @@ class Login:
         if self.txtuser.get()=="":
             messagebox.showerror("Error","Please Enter the Email ID to reset Password!")
         else:
-            conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
-            mycursor = conn.cursor()
-            query=("select * from regteach where email=%s")
-            value=(self.txtuser.get(),)
-            mycursor.execute(query,value)
-            row=mycursor.fetchone()
-            # print(row)
+            try:
+                conn = get_mysql_connection()
+                mycursor = conn.cursor()
+                query=("select * from regteach where email=%s")
+                value=(self.txtuser.get(),)
+                mycursor.execute(query,value)
+                row=mycursor.fetchone()
+                # print(row)
 
-            if row==None:
-                messagebox.showerror("Error","Please Enter the Valid Email ID!")
-            else:
-                conn.close()
+                if row==None:
+                    messagebox.showerror("Error","Please Enter the Valid Email ID!")
+                else:
+                    conn.close()
                 self.root2=Toplevel()
                 self.root2.title("Forget Password")
                 self.root2.geometry("400x400+610+170")

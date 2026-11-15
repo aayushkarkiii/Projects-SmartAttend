@@ -1,12 +1,11 @@
-import mysql.connector
+from db_config import get_mysql_connection
 
-conn = mysql.connector.connect(user='root', password='admin',host='localhost',database='face_recognition',port=3306)
-cursor = conn.cursor()
-
-cursor.execute("show databases")
-
-data = cursor.fetchall()
-
-print(data)
-
-conn.close()
+try:
+    conn = get_mysql_connection()
+    cursor = conn.cursor()
+    cursor.execute("show databases")
+    data = cursor.fetchall()
+    print("Databases:", data)
+    conn.close()
+except Exception as e:
+    print("MySQL connection failed:", e)
